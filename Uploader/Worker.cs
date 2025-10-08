@@ -18,8 +18,8 @@ public partial class Worker(
         while (!stoppingToken.IsCancellationRequested)
         {
             await SendEventsAsync(stoppingToken);
-
-            await Task.Delay(1000, stoppingToken);
+            logWaiting(_timer.CurrentDelay.TotalSeconds);
+            await _timer.WaitAsync(stoppingToken);
         }
     }
 
@@ -53,6 +53,8 @@ public partial class Worker(
         }
     }
 
+    private readonly BackOffTimer _timer = new BackOffTimer(TimeSpan.FromSeconds(2), TimeSpan.FromMinutes(30), 1.3);
+
     [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK", EventId = 1000)]
     public partial void logOk([CallerMemberName] string? location = null);
 
@@ -61,6 +63,9 @@ public partial class Worker(
 
     [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK. Uploaded status {Status}", EventId = 1002)]
     public partial void logUploadedOk(int status, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: Waiting {Delay:N1} seconds before next cycle", EventId = 1007)]
+    public partial void logWaiting(double delay, [CallerMemberName] string? location = null);
 
     [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Failed", EventId = 1008)]
     public partial void logFail(Exception ex, [CallerMemberName] string? location = null);
