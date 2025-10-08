@@ -1,3 +1,4 @@
+using InfinityMirror.Core.Api;
 using InfinityMirror.Core.Providers;
 using Microsoft.Extensions.FileProviders;
 using Tomlyn;
@@ -22,13 +23,13 @@ public class TomlTemplateLoader : IGeneratorTemplateSource
             using var stream = file.CreateReadStream();
             using var reader = new StreamReader(stream);
             var toml = reader.ReadToEnd();
-            var apiTemplate = Toml.ToModel<Api.DeceptionEvent>(toml) ?? throw new FormatException($"Unable to parse API message template {file.Name}");
-            apiTemplate.Properties ??= new Api.MessageProperties();
-            apiTemplate.Properties.Comment = file.Name;
-            ApiTemplates[file.Name] = apiTemplate;
+            var template = Toml.ToModel<DeceptionEvent>(toml) ?? throw new FormatException($"Unable to parse API message template {file.Name}");
+            template.Properties ??= new MessageProperties();
+            template.Properties.Comment = file.Name;
+            Templates[file.Name] = template;
         }
     }
 
-    public Dictionary<string, Api.DeceptionEvent> ApiTemplates { get; } = new();
+    public Dictionary<string, DeceptionEvent> Templates { get; } = new();
 
 }

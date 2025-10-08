@@ -1,4 +1,5 @@
 using System.Text.Json;
+using InfinityMirror.Core.Api;
 using InfinityMirror.Core.Providers;
 
 namespace InfinityMirror.Core.Features;
@@ -17,33 +18,33 @@ public class EventGenerator(IGeneratorTemplateSource generatorTemplateSource)
     /// Generate messages based on the templates
     /// </summary>
     /// <returns>Collection of events</returns>
-    public ICollection<Api.DeceptionEvent> GenerateApiMessages()
+    public ICollection<DeceptionEvent> GenerateEvents()
     {
-        var messages = new List<Api.DeceptionEvent>();
+        var messages = new List<DeceptionEvent>();
 
-        foreach (var template in generatorTemplateSource.ApiTemplates.Values)
+        foreach (var template in generatorTemplateSource.Templates.Values)
         {
             var genProps = template.Properties.Generation;
             if (
-                (genProps?.Interval == Api.GenerationInterval.Cycle)
+                (genProps?.Interval == GenerationInterval.Cycle)
                 ||
-                (genProps?.Interval == Api.GenerationInterval.Session && !HasRunThisSession)
+                (genProps?.Interval == GenerationInterval.Session && !HasRunThisSession)
             )
             {
-                messages.AddRange(Enumerable.Range(1, genProps.MessagesPerInterval ?? 1).Select(x => GenerateApiMessage(template, x)));
+                messages.AddRange(Enumerable.Range(1, genProps.MessagesPerInterval ?? 1).Select(x => GenerateSingleEvent(template, x)));
             }
         }
         HasRunThisSession = true;
         return messages;
     }
-    
-    private Api.DeceptionEvent GenerateApiMessage(Api.DeceptionEvent template, int SequenceNumber)
+
+    private DeceptionEvent GenerateSingleEvent(DeceptionEvent template, int SequenceNumber)
     {
-        var result = JsonSerializer.Deserialize<Api.DeceptionEvent>(JsonSerializer.Serialize(template)) ?? throw new InvalidOperationException("Failed to clone template");
+        var result = JsonSerializer.Deserialize<DeceptionEvent>(JsonSerializer.Serialize(template)) ?? throw new InvalidOperationException("Failed to clone template");
 
         result.TimeOnClient = DateTimeOffset.UtcNow;
         result.Id = Guid.NewGuid().ToString();
-        result.Properties ??= new Api.MessageProperties();
+        result.Properties ??= new MessageProperties();
         result.Properties.SessionId = SessionId;
         result.Properties.SequenceNumber = SequenceNumber;
 

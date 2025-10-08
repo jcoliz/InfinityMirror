@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using System.Text.Json;
 using Azure.Monitor.Ingestion;
 using InfinityMirror.Core.Features;
 using InfinityMirror.Uploader.Options;
@@ -32,8 +31,8 @@ public partial class Worker(
             // Generate events
             //
 
-            var apiEvents = eventGenerator.GenerateApiMessages();
-            logGeneratedOk(apiEvents.Count);
+            var events = eventGenerator.GenerateEvents();
+            logGeneratedOk(events.Count);
 
             //
             // Upload logs
@@ -43,7 +42,7 @@ public partial class Worker(
             (
                 logsOptions.Value.DcrImmutableId,
                 logsOptions.Value.Stream,
-                [apiEvents],
+                [events],
                 cancellationToken: stoppingToken
             );
             logUploadedOk(response.Status);
