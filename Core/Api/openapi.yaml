@@ -3,10 +3,68 @@ info:
   title: "Infinity Mirror Service API"
   version: 1.0.0
   description: "API for managing and interacting with the Infinity Mirror service. Infinity Mirror is a fictional startup building a deception-based security solution that deploys decoys, lures, and honeytokens to detect attackers inside networks with high fidelity."
+paths:
+  '/api/infm/v1/events':
+    get:
+      operationId: InfinityMirror_GetDeceptionEvents
+      parameters:
+        - name: startingAt
+          in: query
+          description: "Include only results after this UTC date/time (exclusive)"
+          schema:
+            type: string
+            format: date-time
+        - name: endingAt
+          in: query
+          description: "Include only results on or before this UTC date/time (inclusive)"
+          schema:
+            type: string
+            format: date-time
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+        - name: User-Agent
+          in: header
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          schema:
+            type: string
+      responses:
+        200:
+          description: Deception events retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeceptionEventResponse'
 components:
   schemas:
+    DeceptionEventResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          items: 
+            $ref: '#/components/schemas/DeceptionEvent'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    Pagination:
+      type: object
+      additionalProperties: false
+      properties:
+        nextOffset:
+          description: "The offset to use for the next page of results. If null, there are no more results."
+          type: integer
     DeceptionEvent:
       type: object
+      additionalProperties: false
       description: "Infinity Mirror Deception Event (InfinityMirrorDeceptionEvent_CL)."
       properties:
         TimeOnClient:
