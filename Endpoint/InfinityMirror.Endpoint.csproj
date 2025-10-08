@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Core\InfinityMirror.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\**\*.toml" />
+  </ItemGroup>
+
 </Project>

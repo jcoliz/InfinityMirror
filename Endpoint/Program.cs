@@ -1,6 +1,11 @@
+using System.Reflection;
 using InfinityMirror.Core.Api;
+using InfinityMirror.Core.Features;
+using InfinityMirror.Core.Helpers;
+using InfinityMirror.Core.Providers;
 using InfinityMirror.Endpoint.Controllers;
 using InfinityMirror.Endpoint.Helpers;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +27,15 @@ builder.Services.AddOpenApiDocument(options =>
     options.Title = "InfinityMirror.Endpoint";
     options.Description = "Infinity Mirror Service API";
 });
+
+// Provide files from embedded resources
+builder.Services.AddSingleton<IFileProvider>(new EmbeddedFileProvider(Assembly.GetExecutingAssembly()));
+
+// Generator templates are loaded from embedded resources
+builder.Services.AddSingleton<IGeneratorTemplateSource, TomlTemplateLoader>();
+
+// Event generator service
+builder.Services.AddSingleton<EventGenerator>();
 
 // Add controller implementations
 builder.Services.AddSingleton<IInfinityMirrorController, InfinityMirrorControllerImplementation>();
