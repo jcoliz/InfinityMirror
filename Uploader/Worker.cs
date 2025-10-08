@@ -32,15 +32,9 @@ public partial class Worker(
             // Generate events
             //
 
-            var events = eventGenerator.GenerateMessages();
-            logGeneratedOk(events.Count);
-
-            Console.WriteLine($"Event: {JsonSerializer.Serialize(events.First())}");
-
             var apiEvents = eventGenerator.GenerateApiMessages();
-            Console.WriteLine($"API Event: {JsonSerializer.Serialize(apiEvents.First())}");
+            logGeneratedOk(apiEvents.Count);
 
-#if false
             //
             // Upload logs
             //
@@ -49,11 +43,10 @@ public partial class Worker(
             (
                 logsOptions.Value.DcrImmutableId,
                 logsOptions.Value.Stream,
-                [events],
+                [apiEvents],
                 cancellationToken: stoppingToken
             );
             logUploadedOk(response.Status);
-#endif
         }
         catch (Exception ex)
         {

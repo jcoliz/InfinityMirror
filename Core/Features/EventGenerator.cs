@@ -1,5 +1,4 @@
 using System.Text.Json;
-using InfinityMirror.Core.Models;
 using InfinityMirror.Core.Providers;
 
 namespace InfinityMirror.Core.Features;
@@ -18,26 +17,6 @@ public class EventGenerator(IGeneratorTemplateSource generatorTemplateSource)
     /// Generate messages based on the templates
     /// </summary>
     /// <returns>Collection of events</returns>
-    public ICollection<DeceptionEvent> GenerateMessages()
-    {
-        var messages = new List<DeceptionEvent>();
-
-        foreach (var template in generatorTemplateSource.Templates.Values)
-        {
-            var genProps = template.Properties.Generation;
-            if (
-                (genProps?.Interval == GenerationInterval.Cycle)
-                ||
-                (genProps?.Interval == GenerationInterval.Session && !HasRunThisSession)
-            )
-            {
-                messages.AddRange(Enumerable.Range(1, genProps.MessagesPerInterval).Select(x => GenerateMessage(template, x)));
-            }
-        }
-        HasRunThisSession = true;
-        return messages;
-    }
-
     public ICollection<Api.DeceptionEvent> GenerateApiMessages()
     {
         var messages = new List<Api.DeceptionEvent>();
@@ -57,21 +36,7 @@ public class EventGenerator(IGeneratorTemplateSource generatorTemplateSource)
         HasRunThisSession = true;
         return messages;
     }
-
-    private DeceptionEvent GenerateMessage(DeceptionEvent template, int SequenceNumber)
-    {
-        return template with
-        {
-            TimeOnClient = DateTimeOffset.UtcNow,
-            Id = Guid.NewGuid().ToString(),
-            Properties = template.Properties with
-            {
-                SessionId = SessionId,
-                SequenceNumber = SequenceNumber
-            }
-        };
-    }
-
+    
     private Api.DeceptionEvent GenerateApiMessage(Api.DeceptionEvent template, int SequenceNumber)
     {
         var result = JsonSerializer.Deserialize<Api.DeceptionEvent>(JsonSerializer.Serialize(template)) ?? throw new InvalidOperationException("Failed to clone template");

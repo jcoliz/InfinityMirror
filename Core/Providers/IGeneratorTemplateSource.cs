@@ -1,5 +1,3 @@
-using InfinityMirror.Core.Models;
-
 namespace InfinityMirror.Core.Providers;
 
 /// <summary>
@@ -10,7 +8,5 @@ public interface IGeneratorTemplateSource
     /// <summary>
     /// Templates to use for generating messages
     /// </summary>
-    Dictionary<string, DeceptionEvent> Templates { get; }
-
     Dictionary<string, Api.DeceptionEvent> ApiTemplates { get; }
 }
