@@ -1,0 +1,212 @@
+openapi: 3.1.0
+info:
+  title: "Infinity Mirror Service API"
+  version: 1.0.0
+  description: "API for managing and interacting with the Infinity Mirror service. Infinity Mirror is a fictional startup building a deception-based security solution that deploys decoys, lures, and honeytokens to detect attackers inside networks with high fidelity."
+components:
+  schemas:
+    DeceptionEvent:
+      type: object
+      description: "Infinity Mirror Deception Event (InfinityMirrorDeceptionEvent_CL)."
+      properties:
+        timeOnClient:
+          type: string
+          format: date-time
+          description: "UTC time the message was generated on the client side."
+        id:
+          type: string
+          format: uuid
+          nullable: true
+          description: "Unique identifier GUID for the event. This is a string to match the template format."
+        message:
+          type: string
+          description: "Detailed description of the event (might include attacker actions)"
+          default: ""
+        properties:
+          $ref: "#/components/schemas/MessageProperties"
+          description: "Dynamic properties associated with the message"
+        category:
+          type: string
+          nullable: true
+          description: "Category of event (policy or trap type) associated with the message (e.g. \"Network\", \"Host\", \"Application\")"
+        severity:
+          $ref: "#/components/schemas/SeverityLevel"
+          nullable: true
+          description: "How severe of an attack is indicated by this event"
+        campaign:
+          type: string
+          nullable: true
+          description: "Campaign name associated with the event (if applicable). This can be used to group related events together."
+        decoy:
+          $ref: "#/components/schemas/DecoyInfo"
+          description: "Information about the decoy asset that generated the event. This includes the decoy name, type, and any associated comments."
+        deviceEventClass:
+          type: string
+          nullable: true
+          description: "Describes the attacker activity which was detected, leading to the event."
+        sourceAddress:
+          type: string
+          nullable: true
+          description: "Attacker IP address"
+        sourceHostName:
+          type: string
+          nullable: true
+          description: "Attacker host name (if resolved)"
+        sourceHostId:
+          type: string
+          nullable: true
+          description: "Attacker machine unique identifier GUID (if available from the decoy system)"
+        destinationAddress:
+          type: string
+          nullable: true
+          description: "Decoy asset IP that was targeted"
+        destinationPort:
+          type: string
+          nullable: true
+          description: "Decoy service port targeted (if network connection)"
+        mitreTechnique:
+          $ref: "#/components/schemas/MitreTechnique"
+          description: "MITRE ATT&CK technique associated with the event (if applicable). This includes the tactic and technique name and ID."
+        fileHash:
+          type: string
+          nullable: true
+          description: "Hash of any malware or tool captured during the event (if applicable). This can be used to identify known malicious files."
+        user:
+          type: string
+          nullable: true
+          description: "User account name associated with the event (if applicable). This can help identify which user was involved in the activity."
+      required:
+        - timeOnClient
+        - message
+        - properties
+        - decoy
+    MitreTechnique:
+      type: object
+      properties:
+        tactic:
+          $ref: "#/components/schemas/MitreTactic"
+        name:
+          type: string
+          default: ""
+        id:
+          type: string
+          default: ""
+      required:
+        - tactic
+        - name
+        - id
+
+    MitreTactic:
+      type: object
+      properties:
+        name:
+          $ref: "#/components/schemas/MitreTacticName"
+        id:
+          type: string
+          default: ""
+      required:
+        - name
+        - id
+
+    DecoyInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          default: ""
+        comment:
+          type: string
+          default: ""
+        type:
+          $ref: "#/components/schemas/DecoyType"
+        id:
+          type: string
+          format: uuid
+          nullable: true
+      required:
+        - name
+        - comment
+        - type
+
+    MessageProperties:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          format: uuid
+          nullable: true
+        comment:
+          type: string
+          nullable: true
+        sequenceNumber:
+          type: integer
+          format: int32
+        generation:
+          $ref: "#/components/schemas/MessageGenerationProperties"
+          nullable: true
+      required:
+        - sequenceNumber
+
+    MessageGenerationProperties:
+      type: object
+      properties:
+        messagesPerInterval:
+          type: integer
+          format: int32
+          default: 10
+        interval:
+          $ref: "#/components/schemas/GenerationInterval"
+          default: "Cycle"
+      required:
+        - messagesPerInterval
+        - interval
+
+    SeverityLevel:
+      type: string
+      enum:
+        - "Unknown"
+        - "Debug"
+        - "Low"
+        - "Medium"
+        - "High"
+        - "Critical"
+
+    DecoyType:
+      type: string
+      enum:
+        - "VirtualMachine"
+        - "NetworkDevice"
+        - "Application"
+        - "Cluster"
+        - "Database"
+        - "File"
+        - "FileShare"
+        - "Identity"
+        - "IoTSensor"
+        - "Other"
+
+    MitreTacticName:
+      type: string
+      enum:
+        - "Unknown"
+        - "Reconnaissance"
+        - "ResourceDevelopment"
+        - "InitialAccess"
+        - "Execution"
+        - "Persistence"
+        - "PrivilegeEscalation"
+        - "DefenseEvasion"
+        - "CredentialAccess"
+        - "Discovery"
+        - "LateralMovement"
+        - "Collection"
+        - "Exfiltration"
+        - "CommandAndControl"
+        - "Impact"
+
+    GenerationInterval:
+      type: string
+      enum:
+        - "Never"
+        - "Session"
+        - "Cycle"
