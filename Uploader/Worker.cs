@@ -1,8 +1,17 @@
+using System.Runtime.CompilerServices;
+using Azure.Monitor.Ingestion;
 using InfinityMirror.Core.Features;
+using InfinityMirror.Uploader.Options;
+using Microsoft.Extensions.Options;
 
 namespace InfinityMirror.Uploader;
 
-public partial class Worker(EventGenerator eventGenerator, ILogger<Worker> logger) : BackgroundService
+public partial class Worker(
+    EventGenerator eventGenerator,
+    LogsIngestionClient logsClient,
+    IOptions<LogIngestionOptions> logsOptions,
+    ILogger<Worker> logger
+) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -14,13 +23,45 @@ public partial class Worker(EventGenerator eventGenerator, ILogger<Worker> logge
         }
     }
 
-    private Task SendEventsAsync(CancellationToken stoppingToken)
+    private async Task SendEventsAsync(CancellationToken stoppingToken)
     {
-        var events = eventGenerator.GenerateMessages();
-        foreach (var ev in events)
+        try
         {
-            logger.LogInformation("Generated event: {EventId} at {EventTime}", ev.Id, ev.TimeOnClient);
+            //
+            // Generate events
+            //
+
+            var events = eventGenerator.GenerateMessages();
+            logGeneratedOk(events.Count);
+
+            //
+            // Upload logs
+            //
+
+            var response = await logsClient.UploadAsync
+            (
+                logsOptions.Value.DcrImmutableId,
+                logsOptions.Value.Stream,
+                [events],
+                cancellationToken: stoppingToken
+            );
+            logUploadedOk(response.Status);
         }
-        return Task.CompletedTask;
+        catch (Exception ex)
+        {
+            logFail(ex);
+        }
     }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK", EventId = 1000)]
+    public partial void logOk([CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK. Generated {Count} events", EventId = 1001)]
+    public partial void logGeneratedOk(int count, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "{Location}: OK. Uploaded status {Status}", EventId = 1002)]
+    public partial void logUploadedOk(int status, [CallerMemberName] string? location = null);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "{Location}: Failed", EventId = 1008)]
+    public partial void logFail(Exception ex, [CallerMemberName] string? location = null);
 }

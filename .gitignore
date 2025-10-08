@@ -12,6 +12,9 @@
 *.user
 *.userosscache
 *.sln.docstates
+config.toml
+config.*.toml
+!config.template.toml
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

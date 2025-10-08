@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Alexinea.Extensions.Configuration.Toml" Version="7.0.0" />
+    <PackageReference Include="Azure.Identity" Version="1.16.0" />
+    <PackageReference Include="Azure.Monitor.Ingestion" Version="1.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.13.0" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.9" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
   </ItemGroup>
@@ -18,6 +22,8 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Templates\**\*.toml" />
+    <None Update="config.toml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
-
 </Project>
