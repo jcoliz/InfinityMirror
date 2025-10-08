@@ -11,4 +11,6 @@ public interface IGeneratorTemplateSource
     /// Templates to use for generating messages
     /// </summary>
     Dictionary<string, DeceptionEvent> Templates { get; }
+
+    Dictionary<string, Api.DeceptionEvent> ApiTemplates { get; }
 }

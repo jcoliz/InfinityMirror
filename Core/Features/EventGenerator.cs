@@ -1,3 +1,4 @@
+using System.Text.Json;
 using InfinityMirror.Core.Models;
 using InfinityMirror.Core.Providers;
 
@@ -37,6 +38,26 @@ public class EventGenerator(IGeneratorTemplateSource generatorTemplateSource)
         return messages;
     }
 
+    public ICollection<Api.DeceptionEvent> GenerateApiMessages()
+    {
+        var messages = new List<Api.DeceptionEvent>();
+
+        foreach (var template in generatorTemplateSource.ApiTemplates.Values)
+        {
+            var genProps = template.Properties.Generation;
+            if (
+                (genProps?.Interval == Api.GenerationInterval.Cycle)
+                ||
+                (genProps?.Interval == Api.GenerationInterval.Session && !HasRunThisSession)
+            )
+            {
+                messages.AddRange(Enumerable.Range(1, genProps.MessagesPerInterval ?? 1).Select(x => GenerateApiMessage(template, x)));
+            }
+        }
+        HasRunThisSession = true;
+        return messages;
+    }
+
     private DeceptionEvent GenerateMessage(DeceptionEvent template, int SequenceNumber)
     {
         return template with
@@ -49,5 +70,18 @@ public class EventGenerator(IGeneratorTemplateSource generatorTemplateSource)
                 SequenceNumber = SequenceNumber
             }
         };
+    }
+
+    private Api.DeceptionEvent GenerateApiMessage(Api.DeceptionEvent template, int SequenceNumber)
+    {
+        var result = JsonSerializer.Deserialize<Api.DeceptionEvent>(JsonSerializer.Serialize(template)) ?? throw new InvalidOperationException("Failed to clone template");
+
+        result.TimeOnClient = DateTimeOffset.UtcNow;
+        result.Id = Guid.NewGuid().ToString();
+        result.Properties ??= new Api.MessageProperties();
+        result.Properties.SessionId = SessionId;
+        result.Properties.SequenceNumber = SequenceNumber;
+
+        return result;
     }
 }

@@ -27,8 +27,16 @@ public class TomlTemplateLoader : IGeneratorTemplateSource
             template.Properties ??= new MessageProperties();
             template.Properties.Comment = file.Name;
             Templates[file.Name] = template;
+
+            var apiTemplate = Toml.ToModel<Api.DeceptionEvent>(toml) ?? throw new FormatException($"Unable to parse API message template {file.Name}");
+            apiTemplate.Properties ??= new Api.MessageProperties();
+            apiTemplate.Properties.Comment = file.Name;
+            ApiTemplates[file.Name] = apiTemplate;
         }
     }
 
     public Dictionary<string, DeceptionEvent> Templates { get; } = new();
+
+    public Dictionary<string, Api.DeceptionEvent> ApiTemplates { get; } = new();
+
 }

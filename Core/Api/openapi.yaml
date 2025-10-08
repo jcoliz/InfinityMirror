@@ -9,86 +9,86 @@ components:
       type: object
       description: "Infinity Mirror Deception Event (InfinityMirrorDeceptionEvent_CL)."
       properties:
-        timeOnClient:
+        TimeOnClient:
           type: string
           format: date-time
           description: "UTC time the message was generated on the client side."
-        id:
+        Id:
           type: string
-          format: uuid
+          #format: uuid
           nullable: true
           description: "Unique identifier GUID for the event. This is a string to match the template format."
-        message:
+        Message:
           type: string
           description: "Detailed description of the event (might include attacker actions)"
           default: ""
-        properties:
+        Properties:
           $ref: "#/components/schemas/MessageProperties"
           description: "Dynamic properties associated with the message"
-        category:
+        Category:
           type: string
           nullable: true
           description: "Category of event (policy or trap type) associated with the message (e.g. \"Network\", \"Host\", \"Application\")"
-        severity:
+        Severity:
           $ref: "#/components/schemas/SeverityLevel"
           nullable: true
           description: "How severe of an attack is indicated by this event"
-        campaign:
+        Campaign:
           type: string
           nullable: true
           description: "Campaign name associated with the event (if applicable). This can be used to group related events together."
-        decoy:
+        Decoy:
           $ref: "#/components/schemas/DecoyInfo"
           description: "Information about the decoy asset that generated the event. This includes the decoy name, type, and any associated comments."
-        deviceEventClass:
+        DeviceEventClass:
           type: string
           nullable: true
           description: "Describes the attacker activity which was detected, leading to the event."
-        sourceAddress:
+        SourceAddress:
           type: string
           nullable: true
           description: "Attacker IP address"
-        sourceHostName:
+        SourceHostName:
           type: string
           nullable: true
           description: "Attacker host name (if resolved)"
-        sourceHostId:
+        SourceHostId:
           type: string
           nullable: true
           description: "Attacker machine unique identifier GUID (if available from the decoy system)"
-        destinationAddress:
+        DestinationAddress:
           type: string
           nullable: true
           description: "Decoy asset IP that was targeted"
-        destinationPort:
+        DestinationPort:
           type: string
           nullable: true
           description: "Decoy service port targeted (if network connection)"
-        mitreTechnique:
+        MitreTechnique:
           $ref: "#/components/schemas/MitreTechnique"
           description: "MITRE ATT&CK technique associated with the event (if applicable). This includes the tactic and technique name and ID."
-        fileHash:
+        FileHash:
           type: string
           nullable: true
           description: "Hash of any malware or tool captured during the event (if applicable). This can be used to identify known malicious files."
-        user:
+        User:
           type: string
           nullable: true
           description: "User account name associated with the event (if applicable). This can help identify which user was involved in the activity."
       required:
-        - timeOnClient
-        - message
-        - properties
-        - decoy
+        - TimeOnClient
+        - Message
+        - Properties
+        - Decoy
     MitreTechnique:
       type: object
       properties:
         tactic:
           $ref: "#/components/schemas/MitreTactic"
-        name:
+        Name:
           type: string
           default: ""
-        id:
+        Id:
           type: string
           default: ""
       required:
@@ -99,9 +99,9 @@ components:
     MitreTactic:
       type: object
       properties:
-        name:
+        Name:
           $ref: "#/components/schemas/MitreTacticName"
-        id:
+        Id:
           type: string
           default: ""
       required:
@@ -111,17 +111,17 @@ components:
     DecoyInfo:
       type: object
       properties:
-        name:
+        Name:
           type: string
           default: ""
-        comment:
+        Comment:
           type: string
           default: ""
-        type:
+        Type:
           $ref: "#/components/schemas/DecoyType"
-        id:
+        Id:
           type: string
-          format: uuid
+          #format: uuid
           nullable: true
       required:
         - name
@@ -131,17 +131,17 @@ components:
     MessageProperties:
       type: object
       properties:
-        sessionId:
+        SessionId:
           type: string
           format: uuid
           nullable: true
-        comment:
+        Comment:
           type: string
           nullable: true
-        sequenceNumber:
+        SequenceNumber:
           type: integer
           format: int32
-        generation:
+        Generation:
           $ref: "#/components/schemas/MessageGenerationProperties"
           nullable: true
       required:
@@ -150,11 +150,11 @@ components:
     MessageGenerationProperties:
       type: object
       properties:
-        messagesPerInterval:
+        MessagesPerInterval:
           type: integer
           format: int32
           default: 10
-        interval:
+        Interval:
           $ref: "#/components/schemas/GenerationInterval"
           default: "Cycle"
       required:

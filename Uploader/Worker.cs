@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using Azure.Monitor.Ingestion;
 using InfinityMirror.Core.Features;
 using InfinityMirror.Uploader.Options;
@@ -34,6 +35,12 @@ public partial class Worker(
             var events = eventGenerator.GenerateMessages();
             logGeneratedOk(events.Count);
 
+            Console.WriteLine($"Event: {JsonSerializer.Serialize(events.First())}");
+
+            var apiEvents = eventGenerator.GenerateApiMessages();
+            Console.WriteLine($"API Event: {JsonSerializer.Serialize(apiEvents.First())}");
+
+#if false
             //
             // Upload logs
             //
@@ -46,6 +53,7 @@ public partial class Worker(
                 cancellationToken: stoppingToken
             );
             logUploadedOk(response.Status);
+#endif
         }
         catch (Exception ex)
         {
