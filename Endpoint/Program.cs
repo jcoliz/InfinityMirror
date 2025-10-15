@@ -6,6 +6,8 @@ using InfinityMirror.Core.Providers;
 using InfinityMirror.Endpoint.Controllers;
 using InfinityMirror.Endpoint.Helpers;
 using Microsoft.Extensions.FileProviders;
+using NSwag;
+using NSwag.Generation.Processors.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,14 @@ builder.Services.AddOpenApiDocument(options =>
 {
     options.Title = "InfinityMirror.Endpoint";
     options.Description = "Infinity Mirror Service API";
+    options.AddSecurity("ApiKeyAuth", new OpenApiSecurityScheme
+    {
+        In = OpenApiSecurityApiKeyLocation.Header,
+        Description = "Enter your token",
+        Name = "X-API-Key",
+        Type = OpenApiSecuritySchemeType.ApiKey
+    });
+    options.OperationProcessors.Add(new OperationSecurityScopeProcessor("ApiKeyAuth"));
 });
 
 // Provide files from embedded resources

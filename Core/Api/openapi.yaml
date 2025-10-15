@@ -3,6 +3,8 @@ info:
   title: "Infinity Mirror Service API"
   version: 1.0.0
   description: "API for managing and interacting with the Infinity Mirror service. Infinity Mirror is a fictional startup building a deception-based security solution that deploys decoys, lures, and honeytokens to detect attackers inside networks with high fidelity."
+security:
+  - ApiKeyAuth: []
 paths:
   '/api/infm/v1/events':
     get:
@@ -32,7 +34,7 @@ paths:
           in: header
           schema:
             type: string
-        - name: Authorization
+        - name: X-API-Key
           in: header
           schema:
             type: string
@@ -202,6 +204,14 @@ components:
         Generation:
           $ref: "#/components/schemas/MessageGenerationProperties"
           nullable: true
+        UserAgent:
+          type: string
+          description: "User-Agent string from the CCF client that requested the event"
+          nullable: true
+        ApiKey:
+          type: string
+          description: "API key from the CCF client that requested the event"
+          nullable: true
       required:
         - sequenceNumber
 
@@ -268,3 +278,9 @@ components:
         - "Never"
         - "Session"
         - "Cycle"
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication
