@@ -3,7 +3,7 @@ using InfinityMirror.Core.Api;
 using InfinityMirror.Core.Features;
 using InfinityMirror.Core.Helpers;
 using InfinityMirror.Core.Providers;
-using InfinityMirror.Endpoint.Controllers;
+using InfinityMirror.Core.Implementations;
 using InfinityMirror.Endpoint.Helpers;
 using Microsoft.Extensions.FileProviders;
 using NSwag;

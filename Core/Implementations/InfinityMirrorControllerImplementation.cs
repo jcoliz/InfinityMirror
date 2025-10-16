@@ -1,7 +1,8 @@
 using InfinityMirror.Core.Api;
 using InfinityMirror.Core.Features;
+using Microsoft.AspNetCore.Http;
 
-namespace InfinityMirror.Endpoint.Controllers;
+namespace InfinityMirror.Core.Implementations;
 
 public class InfinityMirrorControllerImplementation(EventGenerator eventGenerator) : IInfinityMirrorController
 {
