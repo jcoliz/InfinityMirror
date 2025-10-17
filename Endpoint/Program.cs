@@ -56,7 +56,12 @@ var app = builder.Build();
 app.UseOpenApi();
 app.UseSwaggerUi();
 
-app.UseHttpsRedirection();
+var runningincontainer = Convert.ToBoolean(Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") ?? "false");
+
+if (!runningincontainer)
+{
+    app.UseHttpsRedirection();
+}
 
 app.MapControllers();
 
